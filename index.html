@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI dialogue generator...</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom styles for the app */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* A light gray background */
+        }
+        
+        /* Custom styles for a more advanced progress indicator */
+        .loader {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 5px solid #e5e7eb; /* light gray */
+            border-top-color: #3b82f6; /* blue-500 */
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Hiding the default audio player */
+        #audioPlayer {
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <main class="min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-2xl transition-all duration-500">
+            
+            <header class="text-center border-b border-gray-200 pb-6 mb-6">
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">AI Dialogue Generator</h1>
+                <p class="text-gray-500 mt-2">Create natural, multi-speaker conversations with our advanced AI TTS system.</p>
+                <p class="text-xs text-gray-400 mt-4">Developed by: Sujan Rai at the Accessible Resource.</p>
+                <div class="mt-4">
+                    <button id="about-btn" class="text-blue-600 hover:text-blue-800 font-semibold py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors duration-300">
+                        About Accessible Resource
+                    </button>
+                </div>
+            </header>
+            
+            <section id="about-section" class="hidden">
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">About Accessible Resource Project</h2>
+                <div class="space-y-4 text-gray-600 text-base">
+                    <p>Hi dear user, we are the developers from the Accessible Resource team. We've aimed to provide free and best solutions. We are very excited to launch new and useful tools for you. Our vision is to make the world accessible for everyone. 🌍</p>
+                    <p><b>Founder:</b> SM Ripon for Bangla, <b>Co-founder:</b> Sujan Rai from Nepal.</p>
+                    <p>We just don't think about limited technology; we imagine a future-stick technology where without AI, the world is not imaginable.</p>
+                    <p>For more tools, solutions, and resources, keep visiting us. We add a new tool every day. ✨</p>
+                    <p>Join our official Telegram channel for tips, tools, and resources.</p>
+                </div>
+                <div class="mt-6 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button id="join-telegram-btn" class="w-full sm:w-auto bg-sky-500 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:bg-sky-600 transition-all duration-300">
+                        Join Telegram
+                    </button>
+                    <button id="about-back-btn" class="w-full sm:w-auto bg-gray-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-gray-700 transition-all duration-300">
+                        &larr; Back
+                    </button>
+                </div>
+            </section>
+
+            <section id="config-section">
+                <h2 class="text-xl font-semibold mb-4 text-center text-gray-700">Step 1: Configure Voices</h2>
+                <div id="voice-config-inputs" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4 p-4 border rounded-lg bg-gray-50">
+                        <h3 class="font-semibold text-lg text-blue-600">Speaker One</h3>
+                        <div>
+                            <label for="voice-one-name" class="block text-sm font-medium text-gray-700 mb-1">Speaker Name</label>
+                            <input type="text" id="voice-one-name" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Alex">
+                        </div>
+                        <div>
+                            <label for="voice-one-select" class="block text-sm font-medium text-gray-700 mb-1">Select Voice</label>
+                            <select id="voice-one-select" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></select>
+                        </div>
+                    </div>
+                    <div class="space-y-4 p-4 border rounded-lg bg-gray-50">
+                        <h3 class="font-semibold text-lg text-indigo-600">Speaker Two</h3>
+                        <div>
+                            <label for="voice-two-name" class="block text-sm font-medium text-gray-700 mb-1">Speaker Name</label>
+                            <input type="text" id="voice-two-name" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g., Sam">
+                        </div>
+                        <div>
+                            <label for="voice-two-select" class="block text-sm font-medium text-gray-700 mb-1">Select Voice</label>
+                            <select id="voice-two-select" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></select>
+                        </div>
+                    </div>
+                </div>
+                 <div class="mt-6 text-center">
+                    <button id="lock-config-btn" class="bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        Continue to Dialogue &rarr;
+                    </button>
+                </div>
+            </section>
+            
+            <section id="dialogues-section" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Step 2: Write Dialogue</h2>
+                     <button id="edit-config-btn" class="text-sm text-blue-600 hover:underline">&larr; Edit Voices</button>
+                </div>
+                <div id="dialogues-container" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    </div>
+                <div class="flex items-center justify-between mt-6">
+                    <button id="add-more-btn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-all duration-300">
+                        + Add Turn
+                    </button>
+                    <button id="generate-btn" disabled class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:bg-green-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100">
+                        Generate Dialogue
+                    </button>
+                </div>
+            </section>
+            
+            <section id="loading-section" class="hidden text-center py-12" aria-live="polite" role="status">
+                <div class="flex justify-center mb-4">
+                   <span class="loader"></span>
+                </div>
+                <p class="text-lg font-medium text-gray-600">Generating dialogue, please wait...</p>
+                <p class="text-sm text-gray-500">This may take a moment.</p>
+            </section>
+            
+            <section id="error-section" class="hidden text-center py-12" aria-live="assertive">
+                 <div class="text-red-500 mx-auto bg-red-50 rounded-full h-16 w-16 flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                 </div>
+                <p class="text-xl font-semibold text-red-700 mb-2">Sorry, we got a problem.</p>
+                <p id="error-details" class="text-gray-500 mb-6">Please try again later.</p>
+                <button id="retry-btn" class="bg-red-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-red-700 transition-all duration-300">
+                    Retry
+                </button>
+            </section>
+
+            <section id="success-section" class="hidden text-center py-12" aria-live="polite">
+                <div class="text-green-500 mx-auto bg-green-50 rounded-full h-16 w-16 flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                 </div>
+                <p class="text-xl font-semibold text-green-800 mb-4">AI created a dialogue based on your configurations.</p>
+                <div class="flex justify-center gap-4 mt-6">
+                    <button id="play-btn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300">
+                        Play Dialogue
+                    </button>
+                    <button id="download-btn" class="bg-gray-700 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-gray-800 transition-all duration-300">
+                        Download
+                    </button>
+                </div>
+                 <div class="mt-8">
+                    <button id="back-btn" class="text-sm text-gray-500 hover:underline">Start Over</button>
+                </div>
+            </section>
+            
+            <audio id="audioPlayer"></audio>
+        </div>
+    </main>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- STATE & CONFIGURATION ---
+            const GEMINI_VOICES = [
+                'achernar', 'achird', 'algenib', 'algieba', 'alnilam', 'aoede', 'autonoe', 'callirrhoe', 'charon', 
+                'despina', 'enceladus', 'erinome', 'fenrir', 'gacrux', 'iapetus', 'kore', 'laomedeia', 'leda', 'orus', 
+                'puck', 'pulcherrima', 'rasalgethi', 'sadachbia', 'sadaltager', 'schedar', 'sulafat', 'umbriel', 
+                'vindemiatrix', 'zephyr', 'zubenelgenubi'
+            ];
+            let audioBlob = null;
+            let audioUrl = null;
+            let dialogueTurnCounter = 0;
+
+            // --- DOM ELEMENT REFERENCES ---
+            const elements = {
+                aboutSection: document.getElementById('about-section'),
+                configSection: document.getElementById('config-section'),
+                dialoguesSection: document.getElementById('dialogues-section'),
+                loadingSection: document.getElementById('loading-section'),
+                errorSection: document.getElementById('error-section'),
+                successSection: document.getElementById('success-section'),
+                aboutBtn: document.getElementById('about-btn'),
+                joinTelegramBtn: document.getElementById('join-telegram-btn'),
+                aboutBackBtn: document.getElementById('about-back-btn'),
+                voiceOneName: document.getElementById('voice-one-name'),
+                voiceOneSelect: document.getElementById('voice-one-select'),
+                voiceTwoName: document.getElementById('voice-two-name'),
+                voiceTwoSelect: document.getElementById('voice-two-select'),
+                lockConfigBtn: document.getElementById('lock-config-btn'),
+                editConfigBtn: document.getElementById('edit-config-btn'),
+                dialoguesContainer: document.getElementById('dialogues-container'),
+                addMoreBtn: document.getElementById('add-more-btn'),
+                generateBtn: document.getElementById('generate-btn'),
+                errorDetails: document.getElementById('error-details'),
+                retryBtn: document.getElementById('retry-btn'),
+                playBtn: document.getElementById('play-btn'),
+                downloadBtn: document.getElementById('download-btn'),
+                backBtn: document.getElementById('back-btn'),
+                audioPlayer: document.getElementById('audioPlayer'),
+            };
+
+            // --- UTILITY FUNCTIONS ---
+            const base64ToArrayBuffer = (base64) => {
+                const binaryString = atob(base64);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                return bytes.buffer;
+            };
+            
+            const pcmToWav = (pcm16, sampleRate) => {
+                const pcmData = new Int16Array(pcm16);
+                const buffer = new ArrayBuffer(44 + pcmData.byteLength);
+                const view = new DataView(buffer);
+                let offset = 0;
+                
+                const writeString = (view, offset, string) => {
+                    for (let i = 0; i < string.length; i++) {
+                        view.setUint8(offset + i, string.charCodeAt(i));
+                    }
+                };
+
+                writeString(view, offset, 'RIFF'); offset += 4;
+                view.setUint32(offset, 36 + pcmData.byteLength, true); offset += 4;
+                writeString(view, offset, 'WAVE'); offset += 4;
+                writeString(view, offset, 'fmt '); offset += 4;
+                view.setUint32(offset, 16, true); offset += 4;
+                view.setUint16(offset, 1, true); offset += 2;
+                view.setUint16(offset, 1, true); offset += 2;
+                view.setUint32(offset, sampleRate, true); offset += 4;
+                view.setUint32(offset, sampleRate * 2, true); offset += 4;
+                view.setUint16(offset, 2, true); offset += 2;
+                view.setUint16(offset, 16, true); offset += 2;
+                writeString(view, offset, 'data'); offset += 4;
+                view.setUint32(offset, pcmData.byteLength, true); offset += 4;
+
+                for (let i = 0; i < pcmData.length; i++) {
+                    view.setInt16(offset, pcmData[i], true);
+                    offset += 2;
+                }
+
+                return new Blob([view], { type: 'audio/wav' });
+            };
+
+            // --- UI & STATE MANAGEMENT FUNCTIONS ---
+            const showSection = (section) => {
+                ['aboutSection', 'configSection', 'dialoguesSection', 'loadingSection', 'errorSection', 'successSection'].forEach(key => {
+                    elements[key].classList.add('hidden');
+                });
+                section.classList.remove('hidden');
+            };
+
+            const resetApp = () => {
+                if (audioUrl) URL.revokeObjectURL(audioUrl);
+                audioBlob = null;
+                audioUrl = null;
+                elements.audioPlayer.src = '';
+                elements.dialoguesContainer.innerHTML = '';
+                dialogueTurnCounter = 0;
+                elements.voiceOneName.value = '';
+                elements.voiceTwoName.value = '';
+                elements.playBtn.textContent = 'Play Dialogue';
+                addDialogueTurn();
+                addDialogueTurn();
+                showSection(elements.configSection);
+            };
+
+            const populateVoiceSelectors = () => {
+                GEMINI_VOICES.forEach(voice => {
+                    const option1 = new Option(voice, voice);
+                    const option2 = new Option(voice, voice);
+                    elements.voiceOneSelect.add(option1);
+                    elements.voiceTwoSelect.add(option2);
+                });
+                elements.voiceOneSelect.value = 'charon';
+                elements.voiceTwoSelect.value = 'fenrir';
+            };
+            
+            const checkGenerateButtonState = () => {
+                const textareas = elements.dialoguesContainer.querySelectorAll('textarea');
+                const firstTwoAreFilled = textareas.length >= 2 && textareas[0].value.trim() !== '' && textareas[1].value.trim() !== '';
+                elements.generateBtn.disabled = !firstTwoAreFilled;
+            };
+
+            const addDialogueTurn = () => {
+                dialogueTurnCounter++;
+                const isVoiceOne = dialogueTurnCounter % 2 !== 0;
+                const speakerName = isVoiceOne ? (elements.voiceOneName.value || 'Speaker 1') : (elements.voiceTwoName.value || 'Speaker 2');
+                const speakerColor = isVoiceOne ? 'blue' : 'indigo';
+
+                const turnDiv = document.createElement('div');
+                turnDiv.innerHTML = `
+                    <label for="dialogue-turn-${dialogueTurnCounter}" class="text-sm font-medium text-gray-600">${speakerName}'s turn:</label>
+                    <textarea id="dialogue-turn-${dialogueTurnCounter}" rows="2" class="mt-1 w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-${speakerColor}-500 focus:border-${speakerColor}-500" placeholder="Enter text for ${speakerName}..."></textarea>
+                `;
+                elements.dialoguesContainer.appendChild(turnDiv);
+                turnDiv.querySelector('textarea').addEventListener('input', checkGenerateButtonState);
+            };
+
+            // --- EVENT LISTENERS ---
+            elements.aboutBtn.addEventListener('click', () => showSection(elements.aboutSection));
+            elements.aboutBackBtn.addEventListener('click', () => showSection(elements.configSection));
+            elements.joinTelegramBtn.addEventListener('click', () => {
+                window.open('https://t.me/shopnotamal', '_blank');
+            });
+
+            elements.lockConfigBtn.addEventListener('click', () => {
+                if (!elements.voiceOneName.value.trim() || !elements.voiceTwoName.value.trim()) {
+                    alert('Please enter names for both speakers.');
+                    return;
+                }
+                elements.dialoguesContainer.innerHTML = ''; // Clear previous turns
+                dialogueTurnCounter = 0;
+                addDialogueTurn();
+                addDialogueTurn();
+                checkGenerateButtonState();
+                showSection(elements.dialoguesSection);
+            });
+            
+            elements.editConfigBtn.addEventListener('click', () => showSection(elements.configSection));
+
+            elements.addMoreBtn.addEventListener('click', () => {
+                addDialogueTurn();
+                addDialogueTurn();
+            });
+
+            elements.playBtn.addEventListener('click', () => {
+                if (elements.audioPlayer.paused) {
+                    elements.audioPlayer.play();
+                    elements.playBtn.textContent = 'Stop Dialogue';
+                } else {
+                    elements.audioPlayer.pause();
+                    elements.audioPlayer.currentTime = 0;
+                    elements.playBtn.textContent = 'Play Dialogue';
+                }
+            });
+
+            elements.audioPlayer.addEventListener('ended', () => {
+                elements.playBtn.textContent = 'Play Dialogue';
+            });
+            
+            elements.downloadBtn.addEventListener('click', () => {
+                if (!audioBlob) return;
+                const now = new Date();
+                const date = now.toISOString().split('T')[0];
+                const time = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+                const v1 = elements.voiceOneName.value || 'speaker1';
+                const v2 = elements.voiceTwoName.value || 'speaker2';
+
+                const a = document.createElement('a');
+                a.href = audioUrl;
+                a.download = `toolnova_dialog_between_${v1}_and_${v2}_on_${date}_${time}.wav`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+
+            elements.retryBtn.addEventListener('click', resetApp);
+            elements.backBtn.addEventListener('click', resetApp);
+            
+            // --- MAIN API CALL LOGIC ---
+            elements.generateBtn.addEventListener('click', async () => {
+                showSection(elements.loadingSection);
+                
+                const speaker1Name = elements.voiceOneName.value.trim();
+                const speaker2Name = elements.voiceTwoName.value.trim();
+                const speaker1Voice = elements.voiceOneSelect.value;
+                const speaker2Voice = elements.voiceTwoSelect.value;
+                
+                let conversation = '';
+                const textareas = elements.dialoguesContainer.querySelectorAll('textarea');
+                textareas.forEach((ta, index) => {
+                    const text = ta.value.trim();
+                    if (text) {
+                        const speakerName = (index % 2 === 0) ? speaker1Name : speaker2Name;
+                        conversation += `${speakerName}: ${text}\n`;
+                    }
+                });
+
+                if (!conversation) {
+                    elements.errorDetails.textContent = 'Dialogue text cannot be empty.';
+                    showSection(elements.errorSection);
+                    return;
+                }
+
+                const payload = {
+                    contents: [{ parts: [{ text: conversation }] }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            multiSpeakerVoiceConfig: {
+                                speakerVoiceConfigs: [
+                                    { speaker: speaker1Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: speaker1Voice } } },
+                                    { speaker: speaker2Name, voiceConfig: { prebuiltVoiceConfig: { voiceName: speaker2Voice } } }
+                                ]
+                            }
+                        }
+                    },
+                    model: "gemini-2.5-flash-preview-tts"
+                };
+                
+                const apiKey = "AIzaSyAsnCW93NN4GS7WD5f8su5S6EeVdQiA_Ls"; // Leave this as-is; Canvas will automatically provide it.
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    const audioData = result?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+
+                    if (audioData) {
+                        const pcmBuffer = base64ToArrayBuffer(audioData);
+                        audioBlob = pcmToWav(pcmBuffer, 24000);
+                        if (audioUrl) URL.revokeObjectURL(audioUrl); // Clean up previous blob URL
+                        audioUrl = URL.createObjectURL(audioBlob);
+                        elements.audioPlayer.src = audioUrl;
+                        showSection(elements.successSection);
+                    } else {
+                        throw new Error('Audio data not found in the API response.');
+                    }
+                } catch (error) {
+                    console.error("Error during TTS generation:", error);
+                    elements.errorDetails.textContent = `An error occurred: ${error.message}`;
+                    showSection(elements.errorSection);
+                }
+            });
+
+            // --- INITIALIZATION ---
+            populateVoiceSelectors();
+            resetApp();
+        });
+    </script>
+</body>
+</html>
